@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <script src="p5.js" type="text/javascript"></script>
+
+  <!-- Uncomment the lines below to include extra p5 libraries -->
+  <script src="p5.dom.js" type="text/javascript"></script>
+  <script src="p5.sound.js" type="text/javascript"></script>
+  <script src="/socket.io/socket.io.js"></script>
+<!--
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+ -->
+</head>
+
+<body>
+<script>
+var value = 0;
+var count = 0;
+var maxCount = 10;
+var initialRad = 30;
+var dots = [];
+
+var socket = io();
+
+socket.on('pos', function(pos){
+  console.log(pos[0]+","+pos[1]);
+  dots[count] = new Dot(pos[0],pos[1]);
+  count++;
+  if (count == maxCount) count = 0;
+});
+
+function setup() {
+  createCanvas(600,800);
+  for (var i = 0; i<maxCount; i++) {
+    dots[i] = new Dot(-100,-100);
+  }
+}
+
+function draw() {
+  background(200);
+  noStroke();
+  rect(200,100,200,100,10);
+  rect(000,600,200,100,10);
+  rect(200,600,200,100,10);
+  rect(400,600,200,100,10);
+  for (var i = 0; i<maxCount; i++) {
+    dots[i].run();
+  }
+}
+
+function mouseClicked() {
+  dots[count] = new Dot(mouseX,mouseY);
+  count++;
+  if (count == maxCount) count = 0;
+}
+
+var Dot = function(x,y) {
+  this.posX = x;
+  this.posY = y;
+  this.rad = initialRad;
+};
+
+Dot.prototype.run = function(){
+  this.update();
+  this.display();
+};
+
+Dot.prototype.update = function(){
+  // this.posY = this.posY + 10;
+  this.rad = max(this.rad - 1,10);
+};
+
+Dot.prototype.display = function(){
+  fill(240,140,140);
+  noStroke();
+  ellipse(this.posX,this.posY,2*this.rad,2*this.rad);
+};
+</script>
+</body>
+</html>
